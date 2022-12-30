@@ -27,7 +27,7 @@ jobs:
     - name: Install python${{ steps.python-version.outputs.version }}
       uses: actions/setup-python@v2
       with:
-        python-version:${{ steps.python-version.outputs.version }}
+        python-version: ${{ steps.python-version.outputs.version }}
 
     - name: Install poetry
       uses: Gr1N/setup-poetry@v7
@@ -100,7 +100,7 @@ jobs:
     - name: Tag repository
       shell: bash
       id: get-next-tag
-      if: (${{ steps.current.outputs.version}} !=${{ steps.published.outputs.version }})
+      if: (${{ steps.current.outputs.version}} != ${{ steps.published.outputs.version }})
       run: |
         TAG_NAME=${{ steps.current.outputs.version}}
         echo "::set-output name=tag-name::$TAG_NAME"
@@ -109,7 +109,7 @@ jobs:
         git config user.email "actions@users.noreply.github.com"
         git tag --annotate --message="Automated tagging system" $TAG_NAME${{ github.sha }}
     - name: Push the tag
-      if: (steps.current.outputs.version != steps.published.outputs.version)
+      if: (${{ steps.current.outputs.version}} != ${{ steps.published.outputs.version }})
       env:
         TAG_NAME:${{ steps.current.outputs.version }}
       run: |
