@@ -86,7 +86,7 @@ jobs:
         echo "the secret \'PYPI_API_TOKEN\' has not been made"
         echo "Please go to \'settings \> secrets \> actions\' to create it"
     - name: Publish to pypi if new version
-      if: (steps.current.outputs.version != steps.published.outputs.version)
+      if: (${{ steps.current.outputs.version}} != ${{ steps.published.outputs.version }})
       shell: bash
       run: |
         # poetry config repositories.pypi https://test.pypi.org/legacy/
