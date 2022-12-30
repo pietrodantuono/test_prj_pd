@@ -1,0 +1,53 @@
+[tool.black]
+line-length = 79 # Code length, not docstrings
+
+[tool.poetry]
+name = "test_prj_pd"
+version = "0.1.0"
+description = "Short description about the project"
+authors = ["Pietro D'Antuono <pietro.dantuono@vub.be>"]
+readme = "README.md"
+
+[tool.poetry.urls]
+"Change Log" = "https://github.com/pietrodantuono/test_prj_pd/blob/main/CHANGELOG.md"
+"Bug Tracker" = "https://github.com/pietrodantuono/test_prj_pd/issues"
+"Organisation Homepage" = "https://github.com/"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+
+[tool.poetry.group.dev.dependencies]
+gitchangelog = "~3.0.4"
+keyring = "*"
+bump2version = "^1.0.1"
+pytest = "^6.2.4"
+black = "*"
+flake8 = "^3.9"
+pylint = "^2.8"
+mypy = "^0.910"
+pyinstrument = "^4.0"
+pytest-cov = "^2.12"
+invoke = "^1.5"
+hypothesis = "^6.14.0"
+cruft = "^2.9.0"
+artifacts-keyring = "^0.3.2"
+[tool.poetry.group.docs.dependencies]
+Sphinx = "^5.0"
+sphinxcontrib-napoleon = "^0.7"
+myst-parser = "^0.18"
+pydata-sphinx-theme = "^0.11.0"
+sphinx_design = "^0.3.0"
+autoclasstoc = "^1.5.2"
+
+[tool.pytest.ini_options]
+markers = [
+    "success",
+    "error"
+]
+testpaths = [
+    "tests"
+]
+
+[build-system]
+requires = ["poetry-core>=1.0"]
+build-backend = "poetry.core.masonry.api"

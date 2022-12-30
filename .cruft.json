@@ -1,0 +1,21 @@
+{
+  "template": "git@ssh.dev.azure.com:v3/24sea/DataDevOps/python-project-template",
+  "commit": "",
+  "context": {
+    "cookiecutter": {
+      "full_name": "Pietro D'Antuono",
+      "email": "pietro.dantuono@vub.be",
+      "project_name": "test_prj_pd",
+      "project_slug": "test_prj_pd",
+      "project_description": "Short description about the project",
+      "project_version": "0.1.0",
+      "python_version": "3.8.15",
+      "start_port": "9000",
+      "devops_platform": "Github",
+      "jupyter": "no",
+      "_template": "git@ssh.dev.azure.com:v3/pietrodantuono/ci_templates/python-simple-project"
+    }
+  },
+  "skip": [
+  ]
+}

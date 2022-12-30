@@ -1,0 +1,8 @@
+ado:
+  organization: ""
+  project: ""
+  repository:
+    name: "test_prj_pd"
+project_name: "test_prj_pd"
+project_slug: "test_prj_pd"
+start_port: 9000

@@ -1,0 +1,120 @@
+name: CI/CD
+on:
+  # push:
+  #   branches: [main]
+  # pull_request:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release'
+        required: true
+        default: 'patch'
+
+jobs:
+  ci:
+    uses: ./.github/workflows/ci.yml  # use the callable tests job to run tests
+  build:
+    name: build
+    needs: [ci]
+    runs-on: [ubuntu-latest]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+    - name: Get python version from .python-version
+      id: python-version
+      run: echo "version=$(cat .python-version)" >> $GITHUB_ENV
+    - name: Install python${{ steps.python-version.outputs.version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version:${{ steps.python-version.outputs.version }}
+
+    - name: Install poetry
+      uses: Gr1N/setup-poetry@v7
+
+    - name: Build package
+      run: poetry build
+
+    - name: Upload built package
+      uses: actions/upload-artifact@v3
+      with:
+        name: test_prj_pd
+        path: dist/
+        retention-days: 1
+  cd:
+    name: cd
+    needs: [ci, build]
+    runs-on: [ubuntu-latest]
+
+    steps:
+    - name: Download built package
+      uses: actions/download-artifact@v3
+      with:
+        name: test_prj_pd
+        path: dist/
+
+    - name: Install poetry
+      uses: Gr1N/setup-poetry@v7
+
+    - name: Install coveo-pypi-cli
+      run: pip install coveo-pypi-cli
+
+    - name: Determine the version for this release from the build
+      id: current
+      run: |
+        BUILD_VER="$(ls dist/test_prj_pd-*.tar.gz)"
+        echo "Path: $BUILD_VER"
+        if [[ $BUILD_VER =~ (test_prj_pd-)([^,][0-9.]{4}) ]]; then
+            echo "::set-output name=version::${BASH_REMATCH[2]}"
+            echo "Version of build: ${BASH_REMATCH[2]}"
+        else
+            echo "No version found found"
+        fi
+        
+    - name: Get latest published version
+      id: published
+      run: |
+        PUB_VER="$(pypi current-version test_prj_pd)"
+        echo "::set-output name=version::$PUB_VER"
+        echo "Latest published version: $PUB_VER"
+
+    - name: "check is PYPI_API_TOKEN exists"
+      env: 
+        super_secret:${{ secrets.PYPI_API_TOKEN }}
+      if:${{ env.super_secret == ''}}
+      run: |
+        echo "the secret \'PYPI_API_TOKEN\' has not been made"
+        echo "Please go to \'settings \> secrets \> actions\' to create it"
+    - name: Publish to pypi if new version
+      if: (steps.current.outputs.version != steps.published.outputs.version)
+      shell: bash
+      run: |
+        # poetry config repositories.pypi https://test.pypi.org/legacy/
+        poetry config pypi-token.pypi${{ secrets.PYPI_API_TOKEN }}
+        if [[ '${{ github.ref_name }}' == 'main' ]]; then
+          poetry publish 
+        else
+          echo "Dry run of publishing the package"
+          poetry publish --dry-run
+        fi
+    - name: Tag repository
+      shell: bash
+      id: get-next-tag
+      if: (${{ steps.current.outputs.version}} !=${{ steps.published.outputs.version }})
+      run: |
+        TAG_NAME=${{ steps.current.outputs.version}}
+        echo "::set-output name=tag-name::$TAG_NAME"
+        echo "This release will be tagged as $TAG_NAME"
+        git config user.name "github-actions"
+        git config user.email "actions@users.noreply.github.com"
+        git tag --annotate --message="Automated tagging system" $TAG_NAME${{ github.sha }}
+    - name: Push the tag
+      if: (steps.current.outputs.version != steps.published.outputs.version)
+      env:
+        TAG_NAME:${{ steps.current.outputs.version }}
+      run: |
+        if [[${{ github.ref_name}} == 'main' ]]; then
+          git push origin $TAG_NAME
+        else
+          echo "If this was the main branch, I would push a new tag named $TAG_NAME"
+        fi
