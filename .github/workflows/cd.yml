@@ -90,7 +90,7 @@ jobs:
       shell: bash
       run: |
         # poetry config repositories.pypi https://test.pypi.org/legacy/
-        poetry config pypi-token.pypi${{ secrets.PYPI_API_TOKEN }}
+        poetry config pypi-token.pypi ${{ secrets.PYPI_API_TOKEN }}
         if [[ '${{ github.ref_name }}' == 'main' ]]; then
           poetry publish 
         else
@@ -107,11 +107,11 @@ jobs:
         echo "This release will be tagged as $TAG_NAME"
         git config user.name "github-actions"
         git config user.email "actions@users.noreply.github.com"
-        git tag --annotate --message="Automated tagging system" $TAG_NAME${{ github.sha }}
+        git tag --annotate --message="Automated tagging system" $TAG_NAME ${{ github.sha }}
     - name: Push the tag
       if: (${{ steps.current.outputs.version}} != ${{ steps.published.outputs.version }})
       env:
-        TAG_NAME:${{ steps.current.outputs.version }}
+        TAG_NAME: ${{ steps.current.outputs.version }}
       run: |
         if [[${{ github.ref_name}} == 'main' ]]; then
           git push origin $TAG_NAME
