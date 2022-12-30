@@ -79,9 +79,9 @@ jobs:
         echo "Latest published version: $PUB_VER"
 
     - name: "check is PYPI_API_TOKEN exists"
-      env: 
-        super_secret:${{ secrets.PYPI_API_TOKEN }}
-      if:${{ env.super_secret == ''}}
+      env:
+        super_secret: ${{ secrets.PYPI_API_TOKEN }}
+      if: ${{ env.super_secret == '' }}
       run: |
         echo "the secret \'PYPI_API_TOKEN\' has not been made"
         echo "Please go to \'settings \> secrets \> actions\' to create it"
