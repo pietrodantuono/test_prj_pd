@@ -5,4 +5,4 @@ branches:
     mode: ContinuousDeployment
 # ignore:
 # merge-message-formats: {}
-next-version: 0.1.0
+next-version: 0.1.1

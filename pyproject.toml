@@ -3,7 +3,7 @@ line-length = 79 # Code length, not docstrings
 
 [tool.poetry]
 name = "test_prj_pd"
-version = "0.1.0"
+version = "0.1.1"
 description = "Short description about the project"
 authors = ["Pietro D'Antuono <pietro.dantuono@vub.be>"]
 readme = "README.md"
