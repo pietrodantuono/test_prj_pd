@@ -53,22 +53,30 @@ jobs:
         name: test_prj_pd
         path: dist/
 
+    - name: "check is TEST_PYPI_API_TOKEN exists"
+      env:
+        super_secret: ${{ secrets.TEST_PYPI_API_TOKEN }}
+      if: ${{ env.super_secret == '' }}
+        run: |
+          echo "the secret \'TEST_PYPI_API_TOKEN\' has not been made"
+          echo "Please go to \'settings \> secrets \> actions\' to create it"
+      if: ${{ env.super_secret != '' }}
+        - name: Publish distribution 📦 to Test PyPI
+          uses: pypa/gh-action-pypi-publish@release/v1
+          with:
+            password: ${{ secrets.TEST_PYPI_API_TOKEN }}
+            repository_url: https://test.pypi.org/legacy/
+
     - name: "check is PYPI_API_TOKEN exists"
       env:
         super_secret: ${{ secrets.PYPI_API_TOKEN }}
       if: ${{ env.super_secret == '' }}
-      run: |
-        echo "the secret \'PYPI_API_TOKEN\' has not been made"
-        echo "Please go to \'settings \> secrets \> actions\' to create it"
-
-    - name: Publish distribution 📦 to Test PyPI
-      uses: pypa/gh-action-pypi-publish@release/v1
-      with:
-        password: ${{ secrets.TEST_PYPI_API_TOKEN }}
-        repository_url: https://test.pypi.org/legacy/
-
-    - name: Publish distribution 📦 to PyPI
-      if: startsWith(github.ref, 'refs/tags')
-      uses: pypa/gh-action-pypi-publish@release/v1
-      with:
-        password: ${{ secrets.PYPI_API_TOKEN }}
+        run: |
+          echo "the secret \'PYPI_API_TOKEN\' has not been made"
+          echo "Please go to \'settings \> secrets \> actions\' to create it"
+      if: ${{ env.super_secret != '' }}
+        - name: Publish distribution 📦 to PyPI
+          if: startsWith(github.ref, 'refs/tags')
+            uses: pypa/gh-action-pypi-publish@release/v1
+            with:
+              password: ${{ secrets.PYPI_API_TOKEN }}
