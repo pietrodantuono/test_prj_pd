@@ -11,7 +11,8 @@ on:
         default: 'patch'
 
 env:
-  PUBLISH_TO_TEST_PYPI: false
+  PUBLISH_TO_TEST_PYPI: true
+  PUBLISH_TO_PYPI: false
 
 jobs:
   ci:
@@ -27,7 +28,7 @@ jobs:
     - name: Get python version from .python-version
       id: python-version
       run: echo "version=$(cat .python-version)" >> $GITHUB_ENV
-    - name: Install python${{ steps.python-version.outputs.version }}
+    - name: Install python ${{ steps.python-version.outputs.version }}
       uses: actions/setup-python@v2
       with:
         python-version: ${{ steps.python-version.outputs.version }}
@@ -41,7 +42,7 @@ jobs:
     - name: Upload built package
       uses: actions/upload-artifact@v3
       with:
-        name: test_prj_pd
+        name: dist
         path: dist/
         retention-days: 1
   cd:
@@ -53,10 +54,9 @@ jobs:
     - name: Download built package
       uses: actions/download-artifact@v3
       with:
-        name: test_prj_pd
+        name: dist
         path: dist/
 
-    if: ${{ env.PUBLISH_TO_TEST_PYPI == 'true' }}
     - name: "check is TEST_PYPI_API_TOKEN exists"
       env:
         super_secret: ${{ secrets.TEST_PYPI_API_TOKEN }}
@@ -64,14 +64,14 @@ jobs:
         run: |
           echo "the secret \'TEST_PYPI_API_TOKEN\' has not been made"
           echo "Please go to \'settings \> secrets \> actions\' to create it"
-      if: ${{ env.super_secret != '' }}
+          exit 1
+      if: ${{ env.super_secret != '' }} and ${{ env.PUBLISH_TO_TEST_PYPI == 'true' }}
         - name: Publish distribution 📦 to Test PyPI
           uses: pypa/gh-action-pypi-publish@release/v1
           with:
             password: ${{ secrets.TEST_PYPI_API_TOKEN }}
             repository_url: https://test.pypi.org/legacy/
 
-    if: ${{ env.PUBLISH_TO_TEST_PYPI == 'false' }}
     - name: "check is PYPI_API_TOKEN exists"
       env:
         super_secret: ${{ secrets.PYPI_API_TOKEN }}
@@ -79,7 +79,8 @@ jobs:
         run: |
           echo "the secret \'PYPI_API_TOKEN\' has not been made"
           echo "Please go to \'settings \> secrets \> actions\' to create it"
-      if: ${{ env.super_secret != '' }}
+          exit 1
+      if: ${{ env.super_secret != '' }} and ${{ env.PUBLISH_TO_PYPI == 'true' }}
         - name: Publish distribution 📦 to PyPI
           if: startsWith(github.ref, 'refs/tags')
             uses: pypa/gh-action-pypi-publish@release/v1
