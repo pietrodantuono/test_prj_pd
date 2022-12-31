@@ -203,7 +203,7 @@ uvloop = ["uvloop (>=0.15.2)"]
 name = "bump2version"
 version = "1.0.1"
 description = "Version-bump your software with a single command!"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.5"
 files = [
@@ -1950,4 +1950,4 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "0e2aac8f65388025fe56dce6976f47c331624968508e62dec9b0555d3bc7a030"
+content-hash = "146d13fb699bb848373a92006729ad5f275912ac2681021023264295d507ebe9"
